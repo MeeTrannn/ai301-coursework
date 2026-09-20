@@ -15,54 +15,41 @@ wrong label is not graded.
 
 **Issue link**
 
-[The individual Path Review issue page. A link to the repository or the issue list
-does not satisfy this field.]
+https://github.com/codepath/pathreview-ai301-fa26-s3/issues/37
+
 
 **Verdict output**
 
-[Your skill's live-mode output for this issue, pasted verbatim and ending with the
-fenced JSON verdict block. A summary does not satisfy this field.]
-
-**The verdict must record `accept` for this issue.** Choose an issue your own skill
-accepts. If your skill rejects every candidate you try, that is a signal about your
-rubric rather than about the issues: revise it and re-run — retries are unlimited and a
-partial re-run costs about $0.20 — or run the skill on different candidates. Output
-recording `reject` for the issue you chose earns no credit for this field.
+Verdict: accept
 
 ```
-paste the output here, including the closing JSON block
+#37 is the strongest fit: documenting the request bodies for POST /profiles and POST /reviews requires reading api/schemas/review.py and api/routes/profiles.py, which is real schema/data-contract work rather than pure infra or app plumbing. It passed all required checks (maintainer active 3 days ago, 5/5 recent commits within 90 days, no assignee or claim on the issue) and both preferred signals (good-first-issue label, tier-1). Ranked above #63 (self-contained test-file fix) and #73 (pure config/docs housekeeping) because it's the one that involves reading and understanding real backend code.
 ```
 
 ---
 
 ## Eval iterations
 
-Quote source text directly in each field below. Paraphrase does not satisfy them.
-
 **Run history**
 
-[The agreement score of each run you did, in order. A single run is a complete answer if
-only one run occurred. **The last score in your list must match the agreement line in the
-`eval-run.txt` you committed** — that file is the record of your final run.]
+1. Full run, `--save-run eval-run.txt`: "agreement: 15/20 scored items (bar: 18/20: below the bar)". Categories: "claimed 4/4 clear-accept 5/8 dead-repo 3/3 policy 1/1 scope 2/4". Disagreements: issue-04, issue-09, issue-19 (gold accept, my verdict reject, failed "Scope fits my skill level"); issue-10, issue-15 (gold reject, my verdict accept, "graded accept").
+2. Revised "Nobody else actively on it" from `preferred` to `required` in the checks table, to address the issue-10/issue-15 pattern (unconfirmed claim comments and prior inactivity-unassignment messages).
+3. Targeted re-check, `--only issue-10,issue-15,issue-01,issue-06,issue-11,issue-14,issue-16`: "agreement: 5/7 scored items". issue-10 and issue-15 still graded "accept" against gold "reject"; issue-01, issue-06, issue-11, issue-14, issue-16 unaffected.
+4. Found the Verdict rule still named only three required checks by name, so the new required row was not gating the verdict. Rewrote it to read: "Accept if all required checks pass: Maintainer alive, Repo in use, Scope fits my skill level, and Nobody else actively on it."
+5. Re-ran the same targeted set: "agreement: 5/7 scored items" — issue-10 and issue-15 still graded "accept", indicating the check's pass condition itself, not just the wiring, was not matching the literal text in these two bundles.
+6. Final full run, `--save-run eval-run.txt`, to regenerate the committed file against the current rubric.md: "agreement: 17/20 scored items (bar: 18/20: below the bar)". Categories: "claimed 4/4 clear-accept 6/8 dead-repo 3/3 policy 1/1 scope 3/4". Remaining disagreements: issue-09, issue-19 (gold accept, my verdict reject, failed "Scope fits my skill level"); issue-10 (gold reject, my verdict accept, "graded accept").
 
 **Issue analysis**
 
-[One scored issue, identified by id (`issue-01` through `issue-20`; the `calib-`
-issues are not scored). State your rubric's decision, the gold label, and the
-reasoning that produced your rubric's result.]
+issue-10: gold label is "reject"; my rubric's verdict was "accept" — "issue-10 reject accept NO graded accept". This issue's comment thread contains an unconfirmed claim: a contributor expressed intent to take on the issue, but no maintainer confirmed the assignment. My rubric's "Nobody else actively on it" check is written to catch "a comment... claiming or expressing intent to take the issue," which should match this pattern, but the check still returned pass and the issue was accepted. The check's intent covers this case correctly, but its evaluation on this specific issue did not, which suggests the pass condition's wording is not specific enough for the grading model to reliably apply against real comment-thread text, rather than a gap in what the check is meant to detect.
 
 **Check rationale**
 
-[One check from the `rubric.md` uploaded to `tools/issue-select/`, quoted as it is
-currently written, with the reasoning behind its current form.]
+The current wording of "Scope fits my skill level" reads: "Issue is centered on data/database work — schema, queries, data pipelines, data validation, docs, or straightforward bug fixes — and does NOT require systems-level work (concurrency, memory management, build-system internals, low-level networking, or infra/CI configuration) as the core task." I wrote it this way because I am building toward data engineering rather than systems engineering, and I wanted a rule a grader could apply the same way I would without asking my opinion of each issue — naming the specific systems-level categories to exclude, rather than a vaguer term like "too advanced," was meant to make the check reproducible.
 
 **Trade-offs**
 
-[What the quoted check gives up. Any one of these is a complete answer: an issue whose
-result it changes, a canary you re-ran with `--only`, a case you accept it will miss, or a
-stated reason nothing changed elsewhere. "Nothing changed, and here is how I know" earns
-the point in full when the reason follows.]
-
+This check is why issue-09 and issue-19 were incorrectly rejected against a gold label of "accept" — both failed with "failed: Scope fits my skill level" in the final run. Because the pass condition treats certain systems-adjacent language as disqualifying without weighing how central it actually is to the issue's core task, it appears to reject issues where such language appears only incidentally. I accept this trade-off deliberately: a rubric this strict about excluding systems-flavored work will sometimes reject issues gold considers fine for a newcomer, but that matches my stated goal of avoiding issues that would pull me into unfamiliar territory, even at the cost of some false rejections.
 ---
 
 ## Selection rationale
@@ -75,10 +62,9 @@ This is also the basis for the claim comment you write in Unit 2.
 
 [Answer all three:
 
-1. The issue's fit to your interests and to the time available.
-2. What the verdict identified correctly, and what you weighed that the rubric could
-   not.
-3. The anticipated difficulty in claiming it.]
+1. The issue 37 fits my interest (I stated that I would be interested in more data engineering side (database, SQL, etc) and this issue would require reading and describing schema/data-contract shapes, not debugging a library version migration.
+2. The verdict does weigh the data engineer vs software engineering part of my rubric but it might still miss the actual judgement on how related to data engineering the repo is (because it might match exact keywords instead of infering the actual task requirement)
+3. I choose the tier 1 - Suitable for beginner so it matches my skill level
 
 ---
 
