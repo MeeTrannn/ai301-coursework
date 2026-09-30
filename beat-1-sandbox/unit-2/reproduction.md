@@ -4,13 +4,13 @@
 
 ### GitHub username
 
-MeeTrannn
+MyTran-GitHub
 
 ## Posted upstream
 
 ### Claim comment
 
-https://github.com/codepath/pathreview-ai301-fa26-s3/issues/37#issuecomment-5905613802
+https://github.com/codepath/pathreview-ai301-fa26-s3/issues/37#issuecomment-5905202280
 
 First time contributing here — I'd like to claim this one.
 
@@ -58,7 +58,7 @@ issue names.
 
 ### Reproduction comment
 
-https://github.com/codepath/pathreview-ai301-fa26-s3/issues/37#issuecomment-5905615109
+https://github.com/codepath/pathreview-ai301-fa26-s3/issues/37#issuecomment-5905214062
 
 Reproduced, and the doc gap has a sharper consequence than I expected when I
 claimed this: sending a JSON body to `POST /profiles` does not fail. It
@@ -284,6 +284,14 @@ also undocumented — a separate gap I am not claiming here. I did not test PDF
 uploads, the `frontend/` client, or whether any existing caller relies on the
 JSON-body behavior in case 1. All results are from a single run on one
 machine.
+
+---
+
+*Edited to correct the environment block. The first version of this comment
+named a personal fork of a different upstream; I have re-run every case above
+on my course fork at `2f4e82f5` and replaced all output and line numbers with
+that run's. Every result was the same, but the environment record was wrong
+and the line numbers were off by one in two places.*
 
 ## Eval iterations
 
