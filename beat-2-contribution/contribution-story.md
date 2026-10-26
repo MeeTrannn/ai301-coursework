@@ -1,4 +1,4 @@
-# Contribution: [Issue Title]
+# Contribution: Combine EIA 861 short form table with long form tables
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -8,10 +8,9 @@ format criteria grade exactly that. Your course repo link is the whole submissio
 files and no evidence uploads are part of Assignment 5.
 
 **Contribution Number:** [1]
-**Student:** [Student name]
-**GitHub Username:** [your GitHub username, exactly as it appears on your profile - no @, no
-profile URL. Your comments upstream are identified by this name.]
-**Issue:** [GitHub issue link]
+**Student:** Mee Tran
+**GitHub Username:** MeeTrannn
+**Issue:** https://github.com/catalyst-cooperative/pudl/issues/4633
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -80,24 +79,67 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
-[1-2 paragraphs in your own words: how you searched, what your scan
-surfaced, what your scout's verdict said, why this issue fits your
-profile, and what you hope to learn. If your scout's verdict on it
-was reject and you chose it anyway, say so here and say why; choosing
-against your own tool silently is what loses points. Close with an
-honest read of the tool itself: where the scout fell short on a real
-wild search and what you changed or would change, or what convinced
-you it held up. **Record the link to your claim comment in this section too.**
-Not claimed yet? Write `claim pending` and today's date where the link goes,
-and add the link the moment your claim lands.]
+My profile is a data engineer moving toward geospatial and climate/energy
+data, so I aimed the scout at spatial databases, Earth-observation formats,
+and climate/energy orgs. The first scans mostly turned up issues that were
+already taken or were chores. A manual sweep of energy orgs led me to
+Catalyst Cooperative's PUDL, and I first locked in on pudl#5566, a dbt
+validation task. I stepped back from it and went to the Issue Selection
+site, where I picked three candidates: OSGeo/grass#3252 and pudl#4633 and
+#4754. I re-graded all three with the patched rubric on 2026-10-25. The
+scout accepted #4633 with the difficulty note **ambitious**, because its
+first success criterion is an open investigation (how EIA folded the
+short-form data into the long-form tables, and whether that holds for
+every year), so what I deliver depends on what I find. Then I read every
+thread. #4633 had no comments, no assignee, and no open PR. #4754 turned
+out to be a parent issue whose three sub-issues are all closed. grass#3252
+has an open PR, and #5566 had been picked up by someone else.
+
+#4633 fits me because it is a data-consistency problem across 12 EIA-861
+energy tables: schema, year-by-year comparison, and getting data to live
+in one place, which is the work I do every day. I hope to learn how a
+real Dagster + dbt pipeline is organized, how a maintainer team decides
+on a data model, and how to work through an open-ended investigation in
+public. Because it is rated ambitious, my claim led with the open
+question: should the investigation be reviewed on its own before I change
+any table, or ship with the integration in one PR?
+
+Honest read of the scout: it held up on what it can see and fell short on
+what it can't. It correctly rejected grass#3252 for its open PR, and after
+my unit-5 patch it caught the open PR that scan 1 had missed on
+pystac-client#582. But my search queries never reached the climate orgs
+where my issue actually lived; I found PUDL by hand. The original scope
+check was so strict that it rejected most real issues. And even after the
+patch, scope-feasible passed pudl#4754, a container issue that was
+effectively finished, because the scout doesn't read sub-issue status.
+Reading the threads myself was what caught it.
+
+Claim comment: https://github.com/catalyst-cooperative/pudl/issues/4633#issuecomment-6406795246
 
 **Toolkit**
 
-- Tool: issue-scout (your scout: your search strategy, your rubric),
-  and how you used it
-- What it produced: [the scan and its verdict on this issue, described]
-- Difficulties: [where it fell short, or "none met" if none did]
-- What changed: [what you patched or would update, or "nothing"]
+- Tool: issue-scout, my search strategy (Q1-Q6 plus ranking filters) and
+  my rubric. I ran two scans in unit 5, then graded my three picks
+  directly (`issue-scout: grade <url> <url> <url>`) after this week's
+  scope patch.
+- What it produced: scan 1 accepted 3 of 58 issues, and scan 2 accepted
+  only Xee#30 of 95. The direct re-grade accepted pudl#4633 and #4754
+  (both difficulty: ambitious) and rejected grass#3252 ("Nobody else
+  actively on it": open PR #4947).
+- Difficulties: the queries missed the climate/energy orgs entirely, so
+  my final issue came from the Issue Selection site, not a scan. The old
+  scope row ("Scope fits my skill level") also required a perfectly
+  bounded issue with no undecided design, which almost nothing in the
+  wild meets. And scope-feasible passed #4754 even though all of its
+  sub-issues were closed. The read-out also listed one check twice.
+- What changed: in unit 5 I added Domain fit and Contribution policy, made
+  any open PR fail "Nobody else actively on it", and fixed the
+  CI-substring filter. In unit 6 I replaced "Scope fits my skill level"
+  with scope-feasible plus a difficulty note that informs instead of
+  rejecting. The patch also dropped my old skill-level gate (data work,
+  not systems work), which I may re-add as its own row. I would also have
+  the scout check sub-issue status, and add per-org queries for
+  catalyst-cooperative, hotosm, and zarr-developers.
 
 ---
 
