@@ -54,16 +54,31 @@ happened; these entries are the toolkit's own timeline.
 All four entries are graded. Keep every heading below, and fill each
 one in the week it belongs to.
 
-**Unit 5: [one line on the tool work]**
+**Unit 5: built issue-scout's fit profile, search strategy, and rubric, and ran two wild scans**
 
-[2-4 sentences: what you built (the scout, your strategy), what broke
-or fell short, what changed because of it.]
+I rewrote my fit profile around geospatial and climate/energy data
+engineering and wrote six search queries plus ranking filters, then ran
+two scans (58 issues, then 95). Several things broke. A substring filter
+on `CI` dropped my best-fitting issue. One query only returned stale hits.
+A `chore` issue ranked first. And the rubric accepted pystac-client#582
+even though it already had an open PR. I fixed the filters, made any open
+PR fail "Nobody else actively on it", and added Domain fit and Contribution
+policy checks. My queries still never reached the energy orgs, so I swept
+them by hand, and that's how I found PUDL.
 
-**Unit 6: [one line on the tool work]**
+**Unit 6: installed the voice guard and patched the scout's scope check**
 
-[2-4 sentences: the voice-guard, the repo-memory file. What broke or
-fell short, and what changed because of it. "Nothing broke" counts when
-it is true - say how you know.]
+I merged my three voice-guide copies into one file under
+`~/.claude/voice-guard/`, added an Upstream section with rules for claims,
+questions, and pings, and installed the PreToolUse hook. The wiring test
+was stopped as expected ("no body the guard can read"), and my claim on
+pudl#4633 passed the guard before it posted, which the guard log records.
+My strict scope row rejected most real issues, so I replaced it with
+scope-feasible plus a difficulty note. Re-grading then showed the new
+check passes container issues whose sub-issues are all closed (pudl#4754),
+which I only caught by reading the thread. The repo-memory file
+(`CLAUDE.local.md`) waits until I clone PUDL for the first step of my
+investigation.
 
 **Unit 7: [one line on the tool work]**
 
