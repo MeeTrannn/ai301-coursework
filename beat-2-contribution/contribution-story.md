@@ -1,4 +1,4 @@
-# Contribution: Combine EIA 861 short form table with long form tables
+# Contribution: Chapters (Sidebar) On/Off shortcut not working in full screen
 
 Path: `beat-2-contribution/contribution-story.md`
 
@@ -10,7 +10,7 @@ files and no evidence uploads are part of Assignment 5.
 **Contribution Number:** [1]
 **Student:** Mee Tran
 **GitHub Username:** MeeTrannn
-**Issue:** https://github.com/catalyst-cooperative/pudl/issues/4633
+**Issue:** https://github.com/code-charity/youtube/issues/4283
 **Pull Request:** [GitHub PR link, once opened]
 
 One repository, built across units 5 to 8, telling the whole story of your real
@@ -94,6 +94,22 @@ drafted, what you did with the draft.]
 
 ## Why I Chose This Issue
 
+**Update, 2026-11-04: I switched issues.** I claimed pudl#4633 on 2026-10-26
+and got no reply from the maintainers in nine days. That issue needs their
+data-model decision before any code, so I couldn't build without them in the
+time left. From the Issue Selection site's list for code-charity/youtube
+(the ImprovedTube browser extension), I read all 16 threads. Most were
+already claimed or fixed. #4283 was the one with a clear bug in one
+function, no claimant, and an earlier attempt closed by its own author. My
+scout's Domain fit check would reject it, because it is JavaScript extension
+work, not geospatial or energy data. I chose it anyway, because a bounded
+bug I can finish and test is worth more this term than a data issue I can't
+get direction on. New claim comment:
+https://github.com/code-charity/youtube/issues/4283#issuecomment-6648580529
+
+What follows is my original write-up for pudl#4633, kept as the record of
+how I got here.
+
 My profile is a data engineer moving toward geospatial and climate/energy
 data, so I aimed the scout at spatial databases, Earth-observation formats,
 and climate/energy orgs. The first scans mostly turned up issues that were
@@ -162,26 +178,46 @@ Claim comment: https://github.com/catalyst-cooperative/pudl/issues/4633#issuecom
 
 **Problem Description**
 
-[In your own words, what is broken or missing?]
+ImprovedTube lets you bind a key to "Chapters (Sidebar) On/Off". The
+reporter says the key toggles YouTube's chapters panel in normal view but
+does nothing in full screen.
 
 **Expected Behavior**
 
-[What should happen?]
+Each press toggles the chapters panel: the first press opens it, the next
+closes it, in normal view and in full screen, with no errors.
 
 **Current Behavior**
 
-[What actually happens?]
+On today's YouTube (Chromium 141, Nov 2026) the first press does open the
+panel, in full screen too, so the exact report didn't reproduce for me. What
+does fail, in both modes, is the second press: the panel never closes. Every
+press also throws `ReferenceError: modernChapters is not defined` in the
+console.
 
 **Affected Components**
 
-[Which parts of the codebase are involved?]
+`ImprovedTube.shortcutChapters` in
+`js&css/web-accessible/www.youtube.com/shortcuts.js`, called by name from
+the keyboard handler `ImprovedTube.shortcutsHandler` in the same file.
+YouTube's chapters panel is a `[target-id*=chapters]` engagement panel inside
+`ytd-watch-flexy #panels`.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code, reading `shortcuts.js` on master and running the real
+  `shortcutChapters` function in Node against stub pages, before I had a
+  browser set up.
+- What it produced: the line numbers, the fact that nothing on the shortcut
+  path treats full screen differently, and two real errors (a
+  `ReferenceError` on line 494, a `TypeError` on line 486 with no chapters
+  panel).
+- Difficulties: my first claim draft said the `ReferenceError` might be the
+  cause. Running the function showed it fires after the click, so it is a
+  side bug. And "YouTube hides the panel in full screen" was a guess that
+  turned out to be wrong.
+- What changed: I rewrote the claim to separate what I had verified from
+  what I had guessed, and made "check it in a real browser" my first step.
 
 ---
 
@@ -189,31 +225,68 @@ Claim comment: https://github.com/catalyst-cooperative/pudl/issues/4633#issuecom
 
 **Environment Setup**
 
-[What a stranger would need to stand this up: your operating system,
-the relevant versions (language, runtime, package manager, the project
-itself), and how you set the project up. Then the challenges you faced
-and how you solved them, or that none came up.]
+macOS (Apple silicon), Node v25.8.0, npm 11.11.0. I forked
+code-charity/youtube and cloned the fork at master `737bbfe6`, then ran
+`npm ci --force` (CI uses `npm install --force`, but that rewrote
+`package-lock.json`; `npm ci` installs the same lockfile without touching
+it). `npx jest` passed 229 tests on master. To watch the bug, I installed
+Playwright 1.56.1 and its Chromium 141.0.7390.37 outside the clone, and
+loaded the clone as an unpacked extension.
+
+Challenges: ESLint crashes on master while parsing its own config (CI runs
+it with continue-on-error), so I left it out of my checks. The extension's
+shortcut has no default key, so my script writes `shortcut_chapters` (bound
+to H) into the extension's storage before opening YouTube.
 
 **Steps to Reproduce**
 
-1. [Step 1]
-2. [Step 2]
-3. [Observed result]
+1. Load the extension unpacked from master, bind "Chapters (Sidebar)
+   On/Off" to H, and open a video with chapters
+   (https://www.youtube.com/watch?v=rfscVS0vtbw).
+2. Press H twice in normal view. Then press F for full screen and press H
+   twice again. After each press, read every `[target-id*=chapters]`
+   panel's `visibility` attribute and watch the console.
+3. Observed: the first press opens the panel in both modes. The second
+   press leaves it open in both modes. Every press logs
+   `ReferenceError: modernChapters is not defined`.
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** [link to commit in your fork]
-- **Screenshots/logs:** [if applicable]
-- **My findings:** [what you discovered during reproduction; an
-  honest, evidenced cannot-reproduce that led you to re-pick or ask
-  the maintainer belongs here and costs you nothing]
+- **Commit showing reproduction:** https://github.com/MeeTrannn/youtube/commit/3393afc3
+  (the unit test that reproduces the bug; it fails 4 of 4 on master)
+- **Screenshots/logs:** browser run on master:
+
+  ```
+  B normal, after H:        ["EXPANDED h=465","HIDDEN h=0"]
+  C normal, after 2nd H:    ["EXPANDED h=465","HIDDEN h=0"]
+  E1 fullscreen, after H:   ["EXPANDED h=766","HIDDEN h=0"]
+  E2 fullscreen, after 2nd H: ["EXPANDED h=766","HIDDEN h=0"]
+  errors: ["modernChapters is not defined" x4]
+  ```
+
+- **My findings:** the reported symptom (no effect in full screen) did not
+  reproduce on today's YouTube; a screenshot after the first press in full
+  screen shows the chapters panel open beside the video. The real bug is
+  that the shortcut can't close the panel, in either mode. After the first
+  press the page holds two chapters panels in `#panels`, the open one and a
+  hidden copy, and the function opens whenever a hidden one exists. I said
+  all this on the thread and asked the reporter which browser still fails
+  in full screen.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: repro-check's idea of reproduction (paste the output, name the
+  environment), carried out with a Playwright script Claude Code wrote that
+  loads the extension, presses the shortcut, and logs every chapters
+  panel's state.
+- What it produced: the before log above, a full-screen screenshot, and the
+  "panel parents" line that located both panels in `ytd-watch-flexy #panels`.
+- Difficulties: headless Chromium is not the reporter's browser, so I can't
+  rule out the original full-screen failure elsewhere. The first browser run
+  overturned my code-reading diagnosis.
+- What changed: I re-scoped the fix to the bug I could prove, the toggle
+  that can't close, and said so in the thread instead of claiming to fix
+  the report as written.
 
 ---
 
@@ -221,67 +294,146 @@ and how you solved them, or that none came up.]
 
 **Analysis**
 
-[Your analysis of the root cause: what is causing the issue, traced
-to the files and functions involved.]
+The "Chapters (Sidebar) On/Off" shortcut runs `ImprovedTube.shortcutChapters` in `js&css/web-accessible/www.youtube.com/shortcuts.js` (line 485 on `master` at `737bbfe6`). The keyboard handler, `ImprovedTube.shortcutsHandler`, calls it by name, and nothing on that path treats full screen differently.
+
+I reproduced it in Chromium 141.0.7390.37 with the extension loaded unpacked from `master`, the shortcut bound to H, on a video with chapters. I pressed H twice in normal view and twice in full screen, and read each `[target-id*=chapters]` panel's `visibility` after every step:
+
+```
+A normal, before H:       ["HIDDEN h=0"]
+B normal, after H:        ["EXPANDED h=465","HIDDEN h=0"]
+C normal, after 2nd H:    ["EXPANDED h=465","HIDDEN h=0"]
+D fullscreen, before H:   ["HIDDEN h=0","HIDDEN h=0"]
+E1 fullscreen, after H:   ["EXPANDED h=766","HIDDEN h=0"]
+E2 fullscreen, after 2nd H: ["EXPANDED h=766","HIDDEN h=0"]
+panel parents: ["EXPANDED in div#panels < div#panels-full-bleed-container < div#full-bleed-container < ytd-watch-flexy",
+                "HIDDEN in div#panels < div#panels-full-bleed-container < div#full-bleed-container < ytd-watch-flexy"]
+errors: ["modernChapters is not defined" x4]
+```
+
+The first press opened the chapters panel in both modes (steps B and E1), so the issue's exact symptom (nothing happens in full screen) did not reproduce on today's YouTube. What did reproduce, in both modes, is that the second press never closes the panel (steps C and E2), and every press logs a `ReferenceError`.
+
+The cause, traced in the code and in the page:
+
+1. The function picks "open" when `document.querySelector('[target-id*=chapters][visibility*=HIDDEN]')` finds anything. After the first press the page holds two chapters panels in `ytd-watch-flexy #panels`, the open one and a hidden copy (step B and "panel parents" above). The hidden copy always matches, so every press takes the "open" branch and the panel can't be closed.
+2. Line 494 reads `modernChapters` and `visibilityButton`, which are `const`s declared inside the `if`/`else` blocks above it. That throws a `ReferenceError` on every press, after the click has already happened.
+3. Line 486 reads `.clientHeight` of `document.querySelector('[target-id*=chapters]')`, which is `null` on a page with no chapters panel, so it throws a `TypeError` there.
 
 **Proposed Solution**
 
-[High-level description of your fix approach, and what you are
-deliberately NOT changing.]
+Rewrite `ImprovedTube.shortcutChapters` so it:
+
+- returns early when the page has no chapters panel;
+- closes the panel when any chapters panel is expanded, by clicking that panel's own `#visibility-button` button;
+- otherwise opens it the way it does today, with the `[modern-chapters] #navigation-button` button, and falls back to removing the `visibility` attribute (logging the existing console message) only when that button is missing.
+
+What I won't change: the shortcut's key binding, the menu entry and its translations, the keyboard handler, `shortcutTranscript` (it has the same shape and may have the same bug, but it belongs in its own PR), and the chapters code in `appearance.js`. I'm also not adding full-screen-specific code, because the open path already works in full screen once the toggle logic is right.
 
 **Implementation Plan**
 
-1. [Modify file X to do Y]
-2. [Add or change Z]
-3. [Update tests]
+1. Change `ImprovedTube.shortcutChapters` in `js&css/web-accessible/www.youtube.com/shortcuts.js` as above, keeping the existing selectors and console message.
+2. Add `tests/unit/shortcut-chapters-toggle.test.js`, which loads the real `shortcuts.js` the way `shortcuts-stuck-key-recovery.test.js` does, with a stub page that keeps a hidden copy of the panel after opening. It checks that the first press opens, the second press closes, no press throws, and a page with no chapters panel is left alone. It must fail on `master` and pass with the fix.
+3. Re-run the browser reproduction on the branch (two presses in normal view, two in full screen) and confirm the panel opens and closes in both with no console errors.
+4. Run the repo's CI checks: `npm ci --force`, `npx jest`, `npm test`.
 
-[Record deviations here as they happen: what changed mid-build and
-why. A recorded deviation is honest work; silent drift is not.]
+Deviation, recorded 2026-11-05: the issue reports the shortcut failing to
+open chapters in full screen. That didn't reproduce, so the plan fixes the
+failure that did (the panel can't be closed, in either mode) and asks the
+reporter which browser still fails in full screen.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: plan-check, grading plan.md and a draft plan comment
+  (`plan-check: grade my plan in plan.md and draft comment in
+  plan-comment.md for issue <url>`).
+- What it produced: run 1 rejected (diagnosis_grounded: unclear). Run 2
+  accepted, with all ten checks passing.
+- Difficulties: run 1 was right. My cause ("YouTube keeps a hidden copy of
+  the panel") was stated as fact without the browser output that showed it,
+  and the comment described my results instead of pasting them. It also
+  caught that the comment dropped two things my claim had promised: an
+  answer to my own overlay-or-sidebar question, and results before any PR.
+  One run took over ten minutes.
+- What changed: I pasted the step-by-step panel states and the "panel
+  parents" line into both plan.md and the comment, said the overlay question
+  was moot, and labelled the post as the promised results. Run 2 also noted
+  the comment dropped the AI disclosure my claim had; I added it back.
 
 ---
 
 ## Testing Strategy
 
-[What observable checks prove the fix: your reproduction steps re-run
-against the built change (before and after), and the repo's own test
-suite or checks with the outcome shown. "Tests pass" with nothing
-observable named is not a strategy.]
+1. **The browser reproduction, before and after.** On master the second
+   press leaves the panel EXPANDED in both modes, with 4 ReferenceErrors.
+   On the branch:
+
+   ```
+   C normal, after 2nd H:    ["HIDDEN h=0","HIDDEN h=0"]
+   E2 fullscreen, after 2nd H: ["HIDDEN h=0","HIDDEN h=0"]
+   errors: []
+   ```
+
+2. **A unit test that fails without the fix.**
+   `tests/unit/shortcut-chapters-toggle.test.js` loads the real
+   `shortcuts.js` with a stub page that keeps a hidden copy of the panel
+   after opening, as YouTube does. It checks that the first press opens,
+   the second closes, no press throws, and a page with no chapters panel is
+   left alone. On master: 4 failed. On the branch: 4 passed.
+3. **The repo's own CI checks** (my ship manifest): `npm ci --force`, then
+   `npx jest` and `npm test`, both 38 suites and 233 tests passing on the
+   branch. ESLint is excluded because it fails on master before linting
+   anything.
+
+Full output is in `test_evidence.md` in my clone.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Jest (the repo's test runner), my Playwright browser script, and
+  the checks in my ship manifest.
+- What it produced: before and after for both the browser run and the new
+  test, plus 233 of 233 tests passing on the branch.
+- Difficulties: the repo has no jsdom, so the test uses a hand-built stub
+  page, which only knows the selectors the shortcut uses. If YouTube changes
+  its markup again, the stub won't notice; only the browser run would.
+- What changed: I made the stub throw on any selector it doesn't know, so a
+  changed selector fails the test loudly instead of returning null.
 
 ---
 
 ## Implementation Notes
 
-[A running log, added to as you work. Date each entry. What you
-built, decisions you made when you made them, wrong turns included.]
+**2026-11-04**
 
-**[Date]**
+Switched from pudl#4633 to code-charity/youtube#4283 (see Why I Chose This
+Issue). Read `shortcutChapters` and ran it in Node against stub pages: found
+the `ReferenceError` (line 494) and the `TypeError` with no chapters panel
+(line 486). My first claim draft overstated the `ReferenceError` as the
+likely cause; checking showed it fires after the click, so I corrected the
+draft before posting.
 
-[Entry]
+**2026-11-05**
 
-**[Date]**
-
-[Entry]
+Forked and cloned the repo and ran the ship-gate install against the new
+clone. Baseline on master: 229 Jest tests pass, ESLint crashes on its own
+config. Ran the bug in Chromium with the extension loaded. Wrong turn: I had
+expected the full-screen open to fail, but it worked. The real failure is
+that the second press never closes the panel, because YouTube leaves a
+hidden copy of the panel next to the open one. Before writing the plan, I
+prototyped the fix on `fix/4283-chapters-shortcut-toggle` to make sure the
+diagnosis held in the browser. It did: open and close now work in both
+modes, with no errors. Committed the fix (99eb9155) and a unit test that
+fails 4 of 4 on master (3393afc3). Decided to leave `shortcutTranscript`
+alone even though it has the same shape: different feature, its own PR.
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: Claude Code for the edits and commits, git on a feature branch.
+- What it produced: two commits, a 23-line change to one function and a
+  117-line test file.
+- Difficulties: the course order is plan first, then build. I built a
+  prototype first because the browser had just overturned my diagnosis and
+  I didn't trust a plan I hadn't seen work.
+- What changed: I wrote plan.md from the prototype's evidence and ran
+  plan-check on it before treating the branch as done.
 
 ---
 
