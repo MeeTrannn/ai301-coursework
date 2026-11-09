@@ -95,10 +95,17 @@ was outside the gate: my commits went up under my other GitHub account, so
 I set a local git identity for the clone, re-authored them, and
 force-pushed before anyone reviewed the PR.
 
-**Unit 8: [one line on the tool work]**
+**Unit 8: installed the PR monitor and wrote my playbook from the repo's real review rhythm**
 
-[2-4 sentences: the PR-monitor and your playbook. What it read, what it
-drafted, what you did with the draft.]
+For my staleness threshold I checked five recent merged PRs from outside
+contributors (#4446, #4434, #4425, #4415, #4414): ImprovedTube2 answered in
+0.5 to 7.5 days, usually with the merge itself, so I set my nudge at 10
+quiet days and tag only ImprovedTube2. On 2026-11-09 the monitor read
+youtube#4469 (open under a day, no comments, no checks reported) and
+drafted a wait note: no nudge until about 2026-11-19. I agreed and posted
+nothing. Nothing in the draft was wrong, but I added a walk-away rule after
+seeing 60 open PRs here, some from July: silence in this repo doesn't mean
+no, so I leave the PR open rather than close it for being quiet.
 
 ---
 
@@ -434,6 +441,17 @@ modes, with no errors. Committed the fix (2702c5d1) and a unit test that
 fails 4 of 4 on master (7478d367). Decided to leave `shortcutTranscript`
 alone even though it has the same shape: different feature, its own PR.
 
+**2026-11-09**
+
+Opened https://github.com/code-charity/youtube/pull/4469; the ship-gate
+hook ran everything again and passed. Then I noticed both commits were
+authored by my other GitHub account (MyTran-GitHub), because this clone
+used my global git identity. I set a local identity for the clone only,
+re-authored the two commits with the same code, messages, and dates (new
+IDs `2702c5d1` and `7478d367`), force-pushed before any review, and updated
+the commit links here and in `test_evidence.md`. Installed the PR monitor,
+wrote my playbook, and ran it: wait, no nudge yet.
+
 **Toolkit**
 
 - Tool: Claude Code for the edits and commits, git on a feature branch.
@@ -495,25 +513,62 @@ with what AI helped with.
 
 **Technical Skills Gained**
 
-[What you learned technically, named concretely.]
+- Reproducing a browser-extension bug for real: loading ImprovedTube
+  unpacked into Chromium with Playwright, setting the shortcut in the
+  extension's storage, pressing keys in normal view and full screen, and
+  logging each panel's `visibility` after every step.
+- Reading YouTube's live page structure: its engagement panels in
+  `ytd-watch-flexy #panels`, and that it keeps a hidden copy of the
+  chapters panel next to the open one.
+- Writing a Jest test with a hand-built stub page (the repo has no jsdom)
+  that loads the real `shortcuts.js` and fails on master before the fix.
+- Fork workflow: a feature branch on my fork, `gh repo set-default` to the
+  upstream repo, a per-clone git identity, and a safe force-push
+  (`--force-with-lease`) to fix commit authorship.
 
 **Challenges Overcome**
 
-[What was hard and how you solved it; point at the real events, the
-Toolkit blocks above are full of them.]
+- The bug didn't reproduce as reported. The first press already opened
+  chapters in full screen. Instead of forcing a fix for something I
+  couldn't see, I logged every panel's state, found the hidden copy, and
+  re-scoped to the bug I could prove: the panel never closes. I said so
+  on the thread and in the PR, and asked which browser still fails.
+- My first diagnosis was wrong. Reading the code, the `ReferenceError`
+  looked like the cause; running it showed it fired after the click. I
+  corrected my claim before posting it (Implementation Notes, 2026-11-04).
+- Switching issues late. pudl#4633 got no reply in nine days and needed a
+  maintainer decision first, so I moved to youtube#4283 on 2026-11-04.
+- ESLint crashes on master, so I excluded it in my manifest with a dated
+  reason and disclosed it in the PR instead of hiding it.
 
 **What I'd Do Differently Next Time**
 
-[Reflection on your process.]
+- Reproduce in a real environment before writing a claim. My code-reading
+  guesses were wrong twice, and the browser run settled it in minutes.
+- Check the repo's maintainer rhythm and open-PR backlog before choosing
+  an issue. pudl's silence cost me nine days, and I only measured
+  code-charity's review rhythm after my PR was open.
+- Set the git identity in every new clone before the first commit, so
+  commits go up under the right account.
+- Follow the plan-then-build order. I built a prototype before writing
+  plan.md. It helped me trust the diagnosis, but writing the plan first
+  would have kept the record cleaner.
 
 ---
 
 ## Resources Used
 
-[What actually helped, not a reading list. List things this story
-already shows you using: the doc you followed to set the environment
-up, the thread that explained the bug, the person who answered you.
-One real entry beats ten plausible ones.]
-
-- [Link to documentation that helped]
-- [Discussion, issue, or post that helped]
+- The issue thread, https://github.com/code-charity/youtube/issues/4283:
+  the report, and the earlier attempt closed by its own author.
+- The repo's CI workflow,
+  https://github.com/code-charity/youtube/blob/master/.github/workflows/eslint_csslint_jest.yml:
+  where my manifest's checks come from, and why ESLint runs with
+  `continue-on-error`.
+- `tests/unit/shortcuts-stuck-key-recovery.test.js` in the repo: the
+  pattern my new test follows to load the real `shortcuts.js`.
+- Playwright (1.56.1) and its Chromium build: what made the browser
+  reproduction possible.
+- Recent merged PRs on code-charity/youtube (#4446, #4434, #4425, #4415,
+  #4414): the review rhythm behind my playbook's threshold.
+- Claude Code, with my course skills (issue-scout, repro-check,
+  plan-check, pr-precheck), voice guard, ship-gate, and PR monitor.
