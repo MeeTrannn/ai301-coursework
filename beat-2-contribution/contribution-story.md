@@ -11,7 +11,7 @@ files and no evidence uploads are part of Assignment 5.
 **Student:** Mee Tran
 **GitHub Username:** MeeTrannn
 **Issue:** https://github.com/code-charity/youtube/issues/4283
-**Pull Request:** [GitHub PR link, once opened]
+**Pull Request:** https://github.com/code-charity/youtube/pull/4469
 
 One repository, built across units 5 to 8, telling the whole story of your real
 contribution. Fill it as you work, not at the end — the sections below ask for evidence that
@@ -80,10 +80,20 @@ which I only caught by reading the thread. The repo-memory file
 (`CLAUDE.local.md`) waits until I clone PUDL for the first step of my
 investigation.
 
-**Unit 7: [one line on the tool work]**
+**Unit 7: wrote my gate manifest and opened youtube#4469 through the ship-gate**
 
-[2-4 sentences: the ship-gate and your gate manifest. What it produced
-on your real branch, what fought you, what changed because of it.]
+My manifest runs the repo's CI checks (`npm ci --force`, `npx jest`,
+`npm test`), and I excluded ESLint because it crashes on master while
+parsing its own config. The ship-gate passed my branch on every run, and
+its evidence check passed because I had real before-and-after output: I
+set up Node, Playwright, and Chromium, loaded the extension, and pressed
+the shortcut myself the way the reporter did. The biggest surprise was
+that the reported bug didn't happen for me, so I had to dig into
+`shortcuts.js` to understand why, and found the real bug: a hidden copy of
+the panel that stopped the shortcut from ever closing it. What fought me
+was outside the gate: my commits went up under my other GitHub account, so
+I set a local git identity for the clone, re-authored them, and
+force-pushed before anyone reviewed the PR.
 
 **Unit 8: [one line on the tool work]**
 
@@ -439,27 +449,45 @@ alone even though it has the same shape: different feature, its own PR.
 
 ## Pull Request
 
-**PR Link:** [GitHub PR URL when opened]
+**PR Link:** https://github.com/code-charity/youtube/pull/4469
 
-**PR Description:** [what the PR says; much of the content above
-adapts into it]
+**PR Title:** Fix chapters shortcut not closing the chapters panel
+
+**PR Description:** Opens with `Fixes #4283`. It explains that YouTube
+keeps a hidden copy of the chapters panel next to the open one, so
+`ImprovedTube.shortcutChapters` always took the "open" branch. The fix
+decides by whether a panel is expanded, returns early when there's no
+chapters panel, and removes the `ReferenceError` on every press. It lists
+what I didn't change (including `shortcutTranscript`) and says I couldn't
+reproduce the full-screen symptom as reported, in Chromium. It pastes the
+browser run before and after (the second press now closes the panel in both
+modes, errors go from 4 to 0), the new test failing 4 of 4 on master and
+passing on the branch, and `npx jest`/`npm test` at 233 of 233. It ends
+with what AI helped with.
 
 **Maintainer Feedback:**
 
-- [Date]: [feedback received, or "none yet"; silence is a normal
-  state and costs you nothing]
-- [Date]: [how you addressed it]
+- 2026-11-09: none yet.
 
-**Status:** [Awaiting review / Iterating / Merged / Closed. The
-status is a fact you record, never a grade: the PR is graded as
-opened.]
+**Status:** Awaiting review
 
 **Toolkit**
 
-- Tool:
-- What it produced:
-- Difficulties:
-- What changed:
+- Tool: the ship-gate (`check_gate.py`), by hand with `--branch --title
+  --body-file pr_draft.md`, then as the PreToolUse hook on `gh pr create`.
+- What it produced: PASS on 2026-11-04 (two runs, the second after I edited
+  the description) and PASS again in the hook on 2026-11-09 before the PR
+  opened. All three manifest checks ok, and all six pr-precheck checks
+  passed, including scope_fidelity and description_truth.
+- Difficulties: ESLint fails on master before linting anything, so I had to
+  decide whether it counted. My manual pass was five days old by the time I
+  opened the PR, so the hook ran everything again. After opening, I saw the
+  commits were authored by my other GitHub account; the gate doesn't check
+  commit identity.
+- What changed: I excluded ESLint in the manifest with a dated reason and
+  disclosed it in the PR. I set this clone's git identity to MeeTrannn,
+  re-authored the two commits (same code, new IDs `2702c5d1`, `7478d367`),
+  force-pushed, and updated the commit links in this story.
 
 ---
 
