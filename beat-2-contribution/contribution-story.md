@@ -252,7 +252,7 @@ to H) into the extension's storage before opening YouTube.
 
 **Reproduction Evidence**
 
-- **Commit showing reproduction:** https://github.com/MeeTrannn/youtube/commit/3393afc3
+- **Commit showing reproduction:** https://github.com/MeeTrannn/youtube/commit/7478d367
   (the unit test that reproduces the bug; it fails 4 of 4 on master)
 - **Screenshots/logs:** browser run on master:
 
@@ -420,8 +420,8 @@ that the second press never closes the panel, because YouTube leaves a
 hidden copy of the panel next to the open one. Before writing the plan, I
 prototyped the fix on `fix/4283-chapters-shortcut-toggle` to make sure the
 diagnosis held in the browser. It did: open and close now work in both
-modes, with no errors. Committed the fix (99eb9155) and a unit test that
-fails 4 of 4 on master (3393afc3). Decided to leave `shortcutTranscript`
+modes, with no errors. Committed the fix (2702c5d1) and a unit test that
+fails 4 of 4 on master (7478d367). Decided to leave `shortcutTranscript`
 alone even though it has the same shape: different feature, its own PR.
 
 **Toolkit**
